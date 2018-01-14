@@ -1,0 +1,36 @@
+<html>
+  <body>
+    <div class="container">
+      <div class="panel panel-default panel-table">
+        <div class="panel-heading">
+          <h2>List of available Mashups</h2>
+        </div>
+        <div class="panel-body">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Categories</th>
+                <th>APIs</th>
+                <th>Published</th>
+              </tr>
+            </thead>
+            <tbody>
+            <% @mashups.each do |mashup| %>
+                <tr>
+                  <td>
+                    <a href="https://www.programmableweb.com/mashup/<%= mashup.pw_id %>" target="_blank"><%= mashup.name %></a>
+                  </td>
+                  <td><%= mashup.tags.map(&:name).join(', ') %></td>
+                  <td><%= mashup.apis.map(&:name).join(', ') %></td>
+                  <td><%= mashup.published %></td>
+                </tr>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+        <%= render partial: 'shared/table_footer', locals: {collection: @mashups} %>
+      </div>
+    </div>
+  </body>
+</html>

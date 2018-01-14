@@ -1,0 +1,59 @@
+<html>
+  <body>
+    <div class="container">
+      <div class="panel panel-default panel-table">
+        <div class="panel-heading">
+          <h2>Cross validations
+            <%= link_to new_validation_path, class: 'btn btn-primary' do %>
+              <i class="glyphicon glyphicon-plus"></i>
+            <% end %>
+          </h2>
+        </div>
+        <div class="panel-body">
+          <table class="table table-hover">
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Folds (k)</th>
+              <th>Dataset size</th>
+              <th>List size</th>
+              <th>Metric</th>
+              <th>Score</th>
+              <th>Max score</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <% @validations.each do |validation| %>
+                <tr>
+                  <td><%= validation.id %></td>
+                  <td><%= validation.name %></td>
+                  <td>
+                    <%= link_to validation.k, "/validations/#{validation.id}/folds" %>
+                  </td>
+                  <td><%= validation.dataset_size %></td>
+                  <td><%= validation.list_size %></td>
+                  <td><%= validation.metric %></td>
+                  <td><%= validation.score %></td>
+                  <td><%= validation.max_score %></td>
+                  <td><%= validation.status %></td>
+                  <td>
+                    <%= link_to run_validation_path(id: validation.id), method: :post, class: 'btn btn-default' do %>
+                        <i class="glyphicon glyphicon-play"></i>
+                    <% end %>
+                    <%= link_to validation, method: :delete, class: 'btn btn-default' do %>
+                        <i class="glyphicon glyphicon-trash"></i>
+                    <% end %>
+                  </td>
+                </tr>
+            <% end %>
+            </tbody>
+          </table>
+        </div>
+        <%= render partial: 'shared/table_footer', locals: {collection: @validations} %>
+      </div>
+    </div>
+  </body>
+</html>

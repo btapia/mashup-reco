@@ -1,0 +1,93 @@
+<html>
+<body>
+<div class="container">
+  <div class="row">
+    <div class="col-xs-9">
+      <div class="panel panel-default panel-table">
+        <div class="panel-heading">
+          <h2>List of available APIs</h2>
+          <%= form_tag(apis_path, method: 'get', id: 'search-form', class: 'form-inline') do %>
+              <%= text_field_tag :q, params[:q], placeholder: 'Search APIs', class: 'form-control' %>
+              <%= submit_tag 'Search', name: nil, class: 'btn btn-default' %>
+          <% end %>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-xs-12">
+              <% if @apis.blank? %>
+                  <tr>
+                    <h4>There are no APIs containing the term <%= params[:q] %>.</h4>
+                  </tr>
+              <% else %>
+                  <table class="table table-hover">
+                    <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Categories</th>
+                      <!--<th>Protocols</th>-->
+                      <th>WAR</th>
+                      <th>Published</th>
+                      <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% @apis.each do |api| %>
+                        <tr>
+                          <td>
+                            <a href="https://www.programmableweb.com/api/<%= api.pw_id %>" target="_blank"><%= api.name %></a>
+                          </td>
+                          <td><%= api.tags.map(&:name).join(', ') %></td>
+                          <!--<td><%#= api.protocols %></td>-->
+                          <td><%= api.war %></td>
+                          <td><%= api.published %></td>
+                          <td>
+                            <%= link_to apis_path(add_param(request.query_parameters, 'sel', api.id)), class: '' do %>
+                                <i class="glyphicon glyphicon-plus"></i>
+                            <% end %>
+                          </td>
+                        </tr>
+                    <% end %>
+                    </tbody>
+                  </table>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <%= render partial: 'shared/table_footer', locals: {collection: @apis} %>
+      </div>
+    </div>
+    <div class="col-xs-3">
+      <% if @selected_apis.present? %>
+          <h3>Selected APIs</h3>
+          <% @selected_apis.each do |api| %>
+              <ul>
+                <li>
+                  <%= api.name %>
+                  <%= link_to apis_path(remove_param(request.query_parameters, 'sel', api.id)), class: '' do %>
+                      <i class="glyphicon glyphicon-remove"></i>
+                  <% end %>
+                </li>
+              </ul>
+          <% end %>
+      <% end %>
+      <% if @recomendation_list.present? %>
+          <h3>CoAPIs</h3>
+          <% @recomendation_list.each do |k, v| %>
+              <dl>
+                <dt><%= v[0] %></dt>
+                <dd>
+                  <div class="progress">
+                    <div class="progress-bar" role="progressbar" aria-valuenow="70"
+                         aria-valuemin="0" aria-valuemax="100" style="width:<%= (v[1]*100).round %>%">
+                      <%= (v[1]*100).round %>%
+                    </div>
+                  </div>
+                </dd>
+              </dl>
+          <% end %>
+      <% end %>
+    </div>
+  </div>
+</div>
+</body>
+</html>

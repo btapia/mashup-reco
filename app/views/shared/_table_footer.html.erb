@@ -1,0 +1,39 @@
+<div class="panel-footer">
+  <div class="row">
+    <div class="col col-xs-4">Page <%= collection.current_page %> of <%= collection.total_pages %></div>
+    <div class="col col-xs-8">
+      <ul class="pagination hidden-xs pull-right">
+        <!-- Previous page link -->
+        <% if collection.current_page - 1 > 0 %>
+            <li>
+              <%= link_to 'Previous', request.query_parameters.merge(page: collection.current_page - 1) %>
+            </li>
+        <% else %>
+            <li class="disabled">
+              <span>Previous</span>
+            </li>
+        <% end %>
+        <!-- Page links -->
+        <% from = [1, collection.current_page - 2].max %>
+        <% to = [from + 4, collection.total_pages].min %>
+        <% (from..to).each do |i| %>
+            <% if i == collection.current_page %>
+                <li class="active"><span><%= i %></span></li>
+            <% else %>
+                <li><%= link_to i, request.query_parameters.merge(page: i) %></li>
+            <% end %>
+        <% end %>
+        <!-- Next page link -->
+        <% if collection.current_page + 1 <= collection.total_pages %>
+            <li>
+              <%= link_to 'Next', request.query_parameters.merge(page: collection.current_page + 1) %>
+            </li>
+        <% else %>
+            <li class="disabled">
+              <span>Next</span>
+            </li>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
