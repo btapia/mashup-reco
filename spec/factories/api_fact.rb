@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :api, class: Api do
-    name Faker::Name.name
+    sequence(:name) { |n| "Example API #{n}" }
+    sequence(:war)
   end
 end

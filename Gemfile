@@ -39,9 +39,6 @@ group :development, :test do
   gem 'awesome_print'
   gem 'will_paginate'
   gem 'bootstrap-sass'
-  gem 'rspec-rails'
-  gem 'factory_girl_rails'
-  gem 'faker'
 end
 
 group :development do
@@ -50,5 +47,12 @@ group :development do
 
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
+end
+
+group :test do
+  gem 'rspec-rails'
+  gem 'factory_girl_rails'
+  gem 'faker'
+  gem 'database_cleaner'
 end
 
