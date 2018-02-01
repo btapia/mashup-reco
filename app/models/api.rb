@@ -28,11 +28,18 @@ class Api < ActiveRecord::Base
       weight = count / weight_sum
       scores.transform_values! { |v| weight * v / mashup_ids.size.to_f }
       combined_scores.merge!(scores) { |_, o, m| o + m }
-      # byebug
     end
     combined_scores
   end
 
+  # Si no le pasa un level o se le asigna n (el número de APIs), hace una sola iteración, calculando las CoAPIs
+  # para el conjunto completo pasado como parámetro y no se multiplica por ningún peso (queda igual).
+  #
+  # Si se le pasa un level (puede ser desde n hasta 1), se van combinando los puntajes. Si se le pasa n-1,
+  # se itera dos veces, calculando para todas las APIs y todos los subconjuntos de n-1 APIs.
+  #
+  # Si se le pasa level=1, se calculan para todos los subconjuntos posibles (incluido subconjuntos de 1, i.e. APIs
+  # individuales).
   def self.co_api_scores(api_ids, limit = nil, excluded_ids = nil, level = nil)
     combined_scores = {}
     n = api_ids.size
@@ -44,7 +51,7 @@ class Api < ActiveRecord::Base
     n.downto(level).each do |count|
       scores = calculate_scores(mashup_set, api_ids, count)
       weight = count / weight_sum
-      scores.transform_values! { |v| weight * v }
+      scores.transform_values! { |v| weight * v } unless weight == 1
       combined_scores.merge!(scores) { |_, o, m| o + m }
       # byebug
     end
