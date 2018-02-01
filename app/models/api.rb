@@ -6,7 +6,7 @@ class Api < ActiveRecord::Base
 
   # Para un grupo de APIs (api_ids) calcula sus CoAPIs y puntajes.
   # Opcionalmente, calcula solo las top N (limit), ordenadas por su puntaje descendentemente.
-  def self.co_api_scores(api_ids, limit = nil, excluded_ids = nil, level = nil)
+  def self.co_api_scores_1(api_ids, limit = nil, excluded_ids = nil, level = nil)
     combined_scores = {}
     n = api_ids.size
     level = n unless level
@@ -31,6 +31,38 @@ class Api < ActiveRecord::Base
       # byebug
     end
     combined_scores
+  end
+
+  def self.co_api_scores(api_ids, limit = nil, excluded_ids = nil, level = nil)
+    combined_scores = {}
+    n = api_ids.size
+    level = n unless level
+    weight_sum = n.downto(level).sum.to_f
+    mashup_set = MashupApi.where.not(mashup_id: excluded_ids)
+
+    # NO FUNCIONA CON TODOS LOS NIVELES
+    n.downto(level).each do |count|
+      scores = calculate_scores(mashup_set, api_ids, count)
+      weight = count / weight_sum
+      scores.transform_values! { |v| weight * v }
+      combined_scores.merge!(scores) { |_, o, m| o + m }
+      # byebug
+    end
+    limit ? combined_scores.first(limit) : combined_scores
+  end
+
+  def self.calculate_scores(mashup_set, api_ids, count)
+    # Mashups que contienen a todas las APIs (a la vez) pasadas como parametro
+    mashup_ids = mashup_set.where(api_id: api_ids).group(:mashup_id).having('COUNT(*) = ?', count).pluck(:mashup_id)
+    # Hash con el ID de la CoAPI y el numero de mashups en la que aparece
+    scores = MashupApi
+                 .where(mashup_id: mashup_ids)
+                 .where.not(api_id: api_ids)
+                 .group(:api_id)
+                 .order('count_all DESC, api_id') # .order('count_all DESC, apis.war DESC')
+                 .count
+    mashup_count = mashup_ids.size.to_f
+    scores.transform_values { |v| v / mashup_count }
   end
 
   def self.search(query)
