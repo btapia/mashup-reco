@@ -1,4 +1,9 @@
 require 'rails_helper'
+require 'support/helpers'
+
+RSpec.configure do |c|
+  c.include Helpers
+end
 
 describe Api do
   it 'Has a valid factory' do
@@ -20,24 +25,18 @@ describe Api do
       @mashups[0].apis = @apis[0..4]
       @mashups[1].apis = @apis[2..6]
       @mashups[2].apis = [@apis[2]] + @apis[5..9]
-      @co_api_scores = [
-          {2 => 1, 3 => 1, 4 => 1, 5 => 1},
-          {1 => 1, 3 => 1, 4 => 1, 5 => 1},
-          {1 => 1/3.0, 2 => 1/3.0, 4 => 2/3.0, 5 => 2/3.0, 6 => 2/3.0, 7 => 2/3.0, 8 => 1/3.0},
-          {1 => 1/2.0, 2 => 1/2.0, 3 => 1, 5 => 1, 6 => 1/2.0, 7 => 1/2.0},
-          {1 => 1/2.0, 2 => 1/2.0, 3 => 1, 4 => 1, 6 => 1/2.0, 7 => 1/2.0},
-          {3 => 1, 4 => 1/2.0, 5 => 1/2.0, 7 => 1, 8 => 1/2.0},
-          {3 => 1, 4 => 1/2.0, 5 => 1/2.0, 6 => 1, 8 => 1/2.0},
-          {3 => 1, 6 => 1, 7 => 1}
-      ]
     end
 
-    it 'coapis' do
-      api_ids = [1]
-      count = api_ids.size
-      mashup_set = MashupApi
-      mashup_ids = mashup_set.where(api_id: api_ids).group(:mashup_id).having('COUNT(*) = ?', count).pluck(:mashup_id)
-      # byebug
+    it '.calculate_scores' do
+      (1..@apis.size).each do |i|
+        @apis.each_slice(i) do |apis|
+          api_ids = apis.map(&:id)
+          test_score = Api.calculate_scores(MashupApi, api_ids)
+          calc_score = calculate_coapis(api_ids, @mashups)
+          puts "#{api_ids}: #{test_score}"
+          expect(test_score).to eq(calc_score)
+        end
+      end
     end
 
     it 'calculates co-APIs' do

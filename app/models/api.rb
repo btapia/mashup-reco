@@ -58,7 +58,8 @@ class Api < ActiveRecord::Base
     limit ? combined_scores.first(limit) : combined_scores
   end
 
-  def self.calculate_scores(mashup_set, api_ids, count)
+  def self.calculate_scores(mashup_set, api_ids, count = nil)
+    count = api_ids.size unless count
     # Mashups que contienen a todas las APIs (a la vez) pasadas como parametro
     mashup_ids = mashup_set.where(api_id: api_ids).group(:mashup_id).having('COUNT(*) = ?', count).pluck(:mashup_id)
     # Hash con el ID de la CoAPI y el numero de mashups en la que aparece
